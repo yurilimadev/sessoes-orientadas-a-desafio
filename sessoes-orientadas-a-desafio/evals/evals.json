@@ -1,0 +1,29 @@
+{
+  "skill_name": "sessoes-orientadas-a-desafio",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Implementar autenticação com OAuth2 + refresh token + tela de login + auditoria de acessos em uma API Node existente.",
+      "expected_output": "Plano de sessões verticais e independentes (contrato/configuração, login, refresh, tela, auditoria, cutover/limpeza), cada uma com objetivo, escopo dentro/fora, dependências, critério de pronto verificável, tamanho P/M/G e contexto mínimo. Nenhum código implementado antes da aprovação. ADR com opções de divisão e AMARRACAO com os status preenchidos.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Migrar o módulo de pagamentos de um monolito para um serviço separado.",
+      "expected_output": "Plano que isola contrato/ACL, extração do domínio, outbox/reconciliação, migração de dados, cutover gradual e desligamento do caminho antigo. Cada sessão com critério de pronto e tamanho; migração de dados e mudança de contrato em sessões próprias; sistema funcional entre sessões.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "continua a demanda de autenticação",
+      "expected_output": "Usando o fixture evals/fixtures/retomada como repositório, com AMARRACAO.md mostrando S01 e S02 concluídas e S03 pendente, o agente lê primeiro o AMARRACAO e o ADR, identifica e confirma S03 como próxima sessão, carrega apenas o contexto mínimo listado no briefing S03 e não replaneja a demanda nem recarrega o repositório inteiro.",
+      "files": [
+        "docs/sessoes/autenticacao/AMARRACAO.md",
+        "docs/sessoes/autenticacao/S03.md",
+        "docs/adr/0001-autenticacao.md",
+        "src/auth/token.ts",
+        "tests/auth/refresh.test.ts"
+      ]
+    }
+  ]
+}
