@@ -47,6 +47,10 @@ Se durante a execução surgir a necessidade de ler algo fora desta lista, pare 
 2. <passo>
 3. <passo>
 
+## Skills de domínio previstas
+
+- <skill de TDD, framework, banco ou PR> — <o que ela decide nesta sessão; "nenhuma" se não houver>
+
 ## Riscos e pontos de atenção
 
 - <risco> → <mitigação>

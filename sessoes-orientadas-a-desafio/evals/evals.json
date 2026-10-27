@@ -24,6 +24,18 @@
         "src/auth/token.ts",
         "tests/auth/refresh.test.ts"
       ]
+    },
+    {
+      "id": 4,
+      "prompt": "Use a skill de TDD para implementar a S03 da demanda de autenticação sem refazer o plano.",
+      "expected_output": "Usando o fixture evals/fixtures/retomada como repositório, o agente lê o AMARRACAO e o briefing S03, confirma o escopo e o critério de pronto, delega o ciclo red-green-refactor à skill de TDD, não cria um segundo plano/ADR/tracker, mantém o escopo da sessão e atualiza o AMARRACAO ao final. Se houver conflito de escopo, expõe e pede decisão.",
+      "files": [
+        "docs/sessoes/autenticacao/AMARRACAO.md",
+        "docs/sessoes/autenticacao/S03.md",
+        "docs/adr/0001-autenticacao.md",
+        "src/auth/token.ts",
+        "tests/auth/refresh.test.ts"
+      ]
     }
   ]
 }

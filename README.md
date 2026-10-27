@@ -24,6 +24,18 @@ Use a skill sempre que o pedido envolver:
 
 Não é para correções pontuais de uma linha nem para perguntas conceituais.
 
+## Composição com outras skills
+
+Ela é uma camada de coordenação, não um substituto para skills de domínio. Em resumo:
+
+- esta skill decide escopo, ordem, dependências, critério de pronto e limite do PR;
+- a skill de domínio decide como implementar (TDD, framework, banco, segurança);
+- convenções do repositório e instruções explícitas do usuário vêm antes das duas;
+- se já existe plano, ADR, tracker ou template de PR, ela usa e referencia em vez de duplicar;
+- em conflito real, ela para e pede decisão em vez de escolher em silêncio.
+
+A matriz completa está em `references/composicao-com-outras-skills.md`.
+
 ## O que ela produz
 
 | Artefato | Caminho padrão | Papel |
@@ -105,7 +117,8 @@ A skill localiza o `AMARRACAO.md`, confirma a sessão pendente e carrega só o c
     │   ├── sessao.md
     │   └── pr.md
     ├── references/
-    │   └── criterios-de-corte.md
+    │   ├── criterios-de-corte.md
+    │   └── composicao-com-outras-skills.md
     └── evals/
         ├── evals.json
         └── fixtures/retomada/
@@ -114,12 +127,14 @@ A skill localiza o `AMARRACAO.md`, confirma a sessão pendente e carrega só o c
 - `SKILL.md` — fluxo, princípios e regras que o agente segue.
 - `assets/` — templates prontos para ADR, amarração, briefing e descrição de PR.
 - `references/criterios-de-corte.md` — heurísticas de fatiamento, tamanhos P/M/G, exemplos bom vs. ruim e anti-padrões.
-- `evals/` — três casos de teste (OAuth2, migração de pagamentos e retomada), incluindo um fixture com `AMARRACAO.md` já preenchido.
+- `references/composicao-com-outras-skills.md` — precedência, handoff e matriz de conflitos com skills de domínio.
+- `evals/` — quatro casos de teste (OAuth2, migração de pagamentos, retomada e composição), incluindo um fixture com `AMARRACAO.md` já preenchido.
 
 ## Casos de teste
 
 1. Autenticação OAuth2 + refresh token + tela de login + auditoria em uma API Node.
 2. Migração do módulo de pagamentos de um monolito para um serviço separado.
 3. Retomada de uma demanda com S01 e S02 concluídas e S03 pendente.
+4. Composição com outra skill (TDD/PR) para executar uma sessão sem refazer o plano.
 
 Os casos estão em `evals/evals.json`. A execução automatizada depende de um harness com Python e subagentes; os arquivos estão prontos para rodar quando esse ambiente estiver disponível.

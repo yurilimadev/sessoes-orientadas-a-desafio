@@ -5,6 +5,7 @@
 - **Caminhos usados:** ADR em `docs/adr/` · sessões em `docs/sessoes/<slug>/`
 - **Criado em:** AAAA-MM-DD
 - **Última atualização:** AAAA-MM-DD
+- **Fontes externas:** <plano, spec, tracker ou ADR existentes; "nenhuma" se não houver>
 
 ## Resumo da demanda
 

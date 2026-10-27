@@ -1,6 +1,6 @@
 ---
 name: sessoes-orientadas-a-desafio
-description: Fatie demandas grandes em sessões de trabalho independentes, cada uma com contexto mínimo e um único PR revisável, antes de escrever qualquer código. Use SEMPRE que o usuário descrever uma funcionalidade, épico, refatoração ou migração com várias partes; pedir para planejar, quebrar, fatiar ou dividir em etapas/PRs/tarefas; colar um prompt longo com múltiplos requisitos; disser "continuar de onde paramos" ou citar um AMARRACAO.md; ou demonstrar preocupação com contexto do agente, tamanho de PR ou code review. Também use ao retomar uma demanda já fatiada. Não use para correções pontuais de uma linha ou perguntas conceituais.
+description: Fatie demandas grandes em sessões de trabalho independentes, cada uma com contexto mínimo e um único PR revisável, antes de escrever qualquer código. Atue como camada de coordenação: defina o quê, a ordem e o contexto, e deixe o como para as skills de domínio. Use SEMPRE que o usuário descrever uma funcionalidade, épico, refatoração ou migração com várias partes; pedir para planejar, quebrar, fatiar ou dividir em etapas/PRs/tarefas; colar um prompt longo com múltiplos requisitos; disser "continuar de onde paramos" ou citar um AMARRACAO.md; ou demonstrar preocupação com contexto do agente, tamanho de PR ou code review. Também use ao retomar uma demanda já fatiada. Não use para correções pontuais de uma linha ou perguntas conceituais.
 ---
 
 # Sessões orientadas a desafio
@@ -19,6 +19,20 @@ O custo é um passo de planejamento no início. Ele se paga na primeira revisão
 - **O sistema continua funcionando entre sessões.** Use feature flag, expand/contract ou adaptador quando a entrega for parcial.
 - **Tudo em português do Brasil**, incluindo ADR, AMARRACAO, briefings e descrição de PR.
 
+## Papel e composição
+
+Esta skill é uma **camada de coordenação**, não uma implementadora. Ela decide o quê entra em cada sessão, em que ordem, com qual contexto e qual é o limite do PR. O **como** — padrões de código, framework, estilo de teste, segurança, formato de commit — pertence às skills de domínio e às convenções do repositório.
+
+Ela foi feita para conviver com outras skills. O contrato é:
+
+- **Divisão de autoridade.** Esta skill manda em escopo, sequência, dependências, critério de pronto e tamanho do PR. A skill de domínio manda em como implementar. Convenções do repositório e instruções explícitas do usuário vêm antes das duas.
+- **Handoff, não substituição.** Ao usar outra skill dentro de uma sessão, passe o objetivo, o dentro/fora do escopo e o critério de pronto. Não peça para ela replanejar a demanda inteira.
+- **Sem fontes de verdade duplicadas.** Se já existe plano, ADR, tracker ou template de PR, use e referencie; não crie um paralelo.
+- **Conflito real se resolve com o usuário.** Se duas instruções incompatíveis apontarem para resultados diferentes, pare e apresente o conflito com opções. Não escolha em silêncio nem ignore uma das skills.
+- **O escopo aprovado continua valendo.** Outra skill pode propor mudanças; se aceitas, atualize o briefing e o AMARRACAO antes de continuar.
+
+Detalhes, matriz de conflitos comuns e exemplos: `references/composicao-com-outras-skills.md`.
+
 ## Passo 0 — Identificar o modo
 
 Antes de qualquer coisa, procure um arquivo de amarração existente:
@@ -34,6 +48,8 @@ Se o repositório usar outro caminho (veja "Artefatos e caminhos"), procure lá.
 - **Existe mas o pedido é uma demanda diferente** → Fluxo A, criando um novo slug; não misture demandas no mesmo AMARRACAO.
 
 Se houver mais de um AMARRACAO e o usuário não disser qual, pergunte antes de ler qualquer outra coisa.
+
+Se o repositório já tiver plano, spec, tracker ou ADR para a demanda, use-os como base e registre o vínculo no AMARRACAO em vez de criar artefatos paralelos.
 
 ## Fluxo A — Demanda nova
 
@@ -78,7 +94,7 @@ Consulte `references/criterios-de-corte.md` para as heurísticas, definições d
 
 ### 4. Validar o plano
 
-Apresente a tabela de sessões ao usuário com objetivo, dependências, critério de pronto e tamanho. Peça aprovação explícita.
+Apresente a tabela de sessões ao usuário com objetivo, dependências, critério de pronto e tamanho. Peça aprovação explícita. Se o host já tiver um modo de plano/aprovação, use-o como checkpoint em vez de criar um segundo.
 
 - Aprovado → siga para o ADR e os artefatos.
 - Ajustes → refaça o fatiamento e apresente de novo.
@@ -86,7 +102,7 @@ Apresente a tabela de sessões ao usuário com objetivo, dependências, critéri
 
 ### 5. Registrar o ADR
 
-Crie `docs/adr/NNNN-<slug>.md` a partir de `assets/adr.md`. Use o próximo número livre. O ADR registra a demanda, as opções de divisão consideradas, a decisão e as consequências. Decisões arquiteturais relevantes que surgirem durante as sessões viram **novos ADRs**, que referenciam o original — não reescreva o ADR da demanda para esconder mudanças de rumo.
+Crie `docs/adr/NNNN-<slug>.md` a partir de `assets/adr.md`. Use o próximo número livre. O ADR registra a demanda, as opções de divisão consideradas, a decisão e as consequências. Se já existir um ADR para esta demanda, atualize-o ou referencie-o; não crie um duplicado. Decisões arquiteturais relevantes que surgirem durante as sessões viram **novos ADRs**, que referenciam o original — não reescreva o ADR da demanda para esconder mudanças de rumo.
 
 ### 6. Criar o AMARRACAO e os briefings
 
@@ -115,18 +131,21 @@ Uma sessão não está concluída enquanto o AMARRACAO não refletir a realidade
 3. **Escolha** a próxima sessão pendente cujas dependências já estejam concluídas. Se houver mais de uma possível, pergunte qual executar.
 4. **Confirme** com o usuário: "Vou executar S0X — <título>". Não replaneje a demanda inteira; se o plano estiver errado, registre o desvio e proponha um ajuste explícito.
 5. **Carregue apenas o contexto mínimo** listado no briefing da sessão (arquivos, documentos e testes). Não leia o restante do repositório "por segurança".
-6. **Execute** a sessão e siga o checklist de encerramento acima.
+6. **Execute** a sessão e siga o checklist de encerramento acima. Se precisar de outra skill para o "como", invoque-a dentro do escopo e siga o contrato de composição.
 
 Se o AMARRACAO estiver inconsistente (status sem PR, dependência não concluída, sessão em andamento sem dono), corrija o arquivo antes de implementar.
 
-## Regras que não se negociam
+## Regras do contrato
 
-- Não implementar antes de o plano de sessões ser aprovado.
+- Não implementar antes de o plano de sessões ser aprovado. Se o usuário pedir explicitamente para dispensar o plano, confirme uma vez e registre a dispensa no AMARRACAO.
 - Não encerrar sessão sem atualizar o AMARRACAO.
 - Item descoberto no meio do caminho não entra na sessão atual: vai para o AMARRACAO como pendente ou fora do escopo, com motivo.
-- Todo artefato é escrito em português do Brasil.
+- Todo artefato criado por esta skill é em português do Brasil. Se outra skill ou convenção do repositório exigir outro idioma, trate como conflito: pergunte ao usuário e registre a decisão.
 - Não misturar refatoração com funcionalidade nova no mesmo PR.
 - Não deixar o sistema quebrado entre sessões; se a entrega é parcial, use feature flag ou expand/contract.
+- Em conflito real com outra skill, não escolha em silêncio: exponha o conflito e peça a decisão do usuário.
+- Não duplicar plano, ADR, tracker ou descrição de PR que já existam; referencie-os.
+- Esta skill decide o quê, a ordem e o contexto; skills de domínio decidem o como.
 
 ## Artefatos e caminhos
 
@@ -150,6 +169,7 @@ Os caminhos são configuráveis: se o usuário, o `AGENTS.md` ou a convenção d
 ## Referências
 
 - `references/criterios-de-corte.md` — heurísticas de fatiamento, P/M/G, exemplos bom vs. ruim e anti-padrões.
+- `references/composicao-com-outras-skills.md` — precedência, handoff, matriz de conflitos e exemplos de convivência com skills de domínio.
 - `assets/adr.md` — template de ADR (Nygard/MADR).
 - `assets/amarracao.md` — template do fio condutor entre sessões.
 - `assets/sessao.md` — template de briefing de sessão.
