@@ -33,6 +33,18 @@ Ela foi feita para conviver com outras skills. O contrato é:
 
 Detalhes, matriz de conflitos comuns e exemplos: `references/composicao-com-outras-skills.md`.
 
+## Protocolo de conversa — um tópico por vez
+
+Quando o usuário apresentar a demanda em tópicos (ou colar um prompt longo com várias partes), trate os tópicos como uma escada: cada degrau se apoia no anterior, e a conversa avança em linha reta.
+
+- **Leia apenas o tópico atual.** Não adiante a leitura dos próximos tópicos nem reserve dúvidas para depois.
+- **Feche o tópico antes de avançar.** Enquanto houver dúvida em aberto no tópico atual, não peça nem aceite o próximo.
+- **Dúvidas pertencem ao tópico atual.** Não misture questionamentos de tópicos diferentes na mesma mensagem.
+- **O tópico fechado vira base do próximo.** Conclusões e suposições registradas em um degrau valem para os seguintes — por isso não se retoma um degrau anterior por conta própria.
+- **Se um tópico posterior contradisser um já fechado,** pare e trate como desvio: reabra explicitamente o tópico afetado com o usuário e registre a mudança.
+- **Vale também para o plano:** apresente primeiro só os títulos na ordem (uma linha por sessão) e depois detalhe sessão por sessão, esperando a confirmação antes da próxima.
+- **Não se aplica à retomada (Fluxo B).** A retomada é direta: um único checkpoint ("Vou executar S0X") e execução.
+
 ## Passo 0 — Identificar o modo
 
 Antes de qualquer coisa, procure um arquivo de amarração existente:
@@ -55,13 +67,13 @@ Se o repositório já tiver plano, spec, tracker ou ADR para a demanda, use-os c
 
 ### 1. Entender
 
-Releia o prompt e produza, internamente ou em rascunho:
+Releia o prompt seguindo o protocolo de conversa: **um tópico por vez, fechado antes do próximo**. Para cada tópico, produza internamente ou em rascunho:
 
 - requisitos **explícitos** (o que foi pedido);
 - requisitos **implícitos** (o que o pedido assume: testes, migração, compatibilidade, observabilidade);
 - **ambiguidades** que mudam o fatiamento.
 
-Faça no máximo **3 perguntas** e agrupe-as em uma única mensagem. Se a resposta não mudar o plano, assuma o padrão mais conservador, registre a suposição no ADR e siga. Não transforme a etapa de entendimento em interrogatório.
+Dúvidas de um tópico são feitas e resolvidas **antes de avançar ao próximo** — no máximo 3 por tópico, em uma única mensagem sobre aquele tópico, para não transformar o entendimento em interrogatório. Se a resposta não mudar o plano, assuma o padrão mais conservador, registre a suposição no ADR e siga.
 
 ### 2. Mapear o terreno
 
@@ -94,10 +106,16 @@ Consulte `references/criterios-de-corte.md` para as heurísticas, definições d
 
 ### 4. Validar o plano
 
-Apresente a tabela de sessões ao usuário com objetivo, dependências, critério de pronto e tamanho. Peça aprovação explícita. Se o host já tiver um modo de plano/aprovação, use-o como checkpoint em vez de criar um segundo.
+Não mostre a tabela inteira de uma vez. Apresente o plano em três ondas, seguindo o protocolo de conversa:
+
+1. **Visão geral:** apenas os títulos na ordem proposta, uma linha por sessão, com as dependências (`S01 → S02 → ...`).
+2. **Detalhe, uma sessão por vez:** objetivo, escopo, critério de pronto, tamanho e contexto mínimo da S01; espere o ok (ou os ajustes) antes de passar à S02; repita até a última.
+3. **Aprovação final:** detalhadas todas as sessões, confirme a aprovação do plano como um todo.
+
+Se o host já tiver um modo de plano/aprovação, use-o como checkpoint em vez de criar um segundo.
 
 - Aprovado → siga para o ADR e os artefatos.
-- Ajustes → refaça o fatiamento e apresente de novo.
+- Ajustes → reapresente as sessões afetadas, uma por vez; não reabra o plano inteiro.
 - Nunca comece a implementar "só a primeira parte" enquanto o plano não estiver aprovado.
 
 ### 5. Registrar o ADR
@@ -124,6 +142,24 @@ Antes de escrever o resumo final ou considerar a sessão terminada:
 
 Uma sessão não está concluída enquanto o AMARRACAO não refletir a realidade.
 
+## Modo de execução
+
+Toda vez que houver sessões prontas para executar, antes de executar a primeira, classifique-as e **proponha** ao usuário o modo de execução — nunca escolha sozinho:
+
+| Modo | Quando usar | Como funciona |
+|---|---|---|
+| **Sequencial no chat** (padrão) | Sessões acopladas: dependências fortes, decisões que dependem do usuário, risco alto | Uma sessão por vez na própria conversa, como descrito nos fluxos |
+| **Paralelo com subagents** | Sessões independentes entre si, host com suporte a subagents | O coordenador lança um subagent por sessão, cada um com o briefing `S0X.md` como contexto e um worktree próprio; recolhe os resultados e atualiza o AMARRACAO |
+| **Bifurcação (worktrees)** | Sessões independentes que o usuário quer conduzir manualmente em outras janelas | Cria os worktrees, prepara o pacote de contexto de cada um e entrega o passo a passo |
+
+**Regra de independência:** duas sessões que tocam o mesmo arquivo ou módulo **não são independentes**, mesmo que a tabela de dependências não as ligue. Sessões com dependência direta entre si ou sobre o mesmo território seguem sequencial.
+
+**Proposta antes de execução:** apresente a classificação (quais sessões são independentes, quais são acopladas), o modo sugerido para cada grupo e espere a aprovação. Se o usuário pedir `/orquestrar`, siga o fluxo do comando: `assets/comando-orquestrar.md`.
+
+**Requisito de host:** os modos paralelo e bifurcação exigem subagents e worktrees. Se o host não suportar, declare e siga sequencial — não improvável um meio-termo.
+
+Contrato detalhado de orquestração: `references/orquestracao.md`.
+
 ## Fluxo B — Retomada
 
 1. **Localize** o AMARRACAO (ou confirme qual usar, se houver vários).
@@ -146,6 +182,7 @@ Se o AMARRACAO estiver inconsistente (status sem PR, dependência não concluíd
 - Em conflito real com outra skill, não escolha em silêncio: exponha o conflito e peça a decisão do usuário.
 - Não duplicar plano, ADR, tracker ou descrição de PR que já existam; referencie-os.
 - Esta skill decide o quê, a ordem e o contexto; skills de domínio decidem o como.
+- Subagent executa dentro do escopo do briefing; o AMARRACAO só é atualizado pelo coordenador, nunca pelo subagent.
 
 ## Artefatos e caminhos
 
@@ -162,6 +199,7 @@ Os caminhos são configuráveis: se o usuário, o `AGENTS.md` ou a convenção d
 
 - [ ] Identifiquei se é demanda nova ou retomada.
 - [ ] Li o AMARRACAO e o ADR (retomada) ou mapeei o terreno (demanda nova).
+- [ ] Fechei todos os tópicos apresentados, um por vez, antes de avançar.
 - [ ] Tenho uma sessão única, com escopo, dependências e critério de pronto.
 - [ ] Sei quais arquivos ler e quais não ler.
 - [ ] Confirmei com o usuário qual sessão executar.
@@ -170,7 +208,9 @@ Os caminhos são configuráveis: se o usuário, o `AGENTS.md` ou a convenção d
 
 - `references/criterios-de-corte.md` — heurísticas de fatiamento, P/M/G, exemplos bom vs. ruim e anti-padrões.
 - `references/composicao-com-outras-skills.md` — precedência, handoff, matriz de conflitos e exemplos de convivência com skills de domínio.
+- `references/orquestracao.md` — contrato de orquestração: subagents em paralelo, worktrees, independência, falhas e consolidação.
 - `assets/adr.md` — template de ADR (Nygard/MADR).
 - `assets/amarracao.md` — template do fio condutor entre sessões.
 - `assets/sessao.md` — template de briefing de sessão.
 - `assets/pr.md` — template de descrição de PR.
+- `assets/comando-orquestrar.md` — template do comando `/orquestrar` e instruções de instalação.
